@@ -232,8 +232,19 @@ static NSString* vertBase =
     _verts = *verts;
 }
 
-@end
+// Workaround for Issue 1301 (https://github.com/cocos2d/cocos2d-objc/issues/1301)
+// where direct assignment to the verts property causes stack corruption on 32 bit
+// devices when compiled with Xcode 6.3.
+//NOTE: Adding support for rending triangles only and removing assumption that we will always have
+//rectangular sprites.
+-(void)setTriangleVertsWorkAround:(CCSpriteTriangleVertexes*)triangleVertices
+{
+    NSAssert(triangleVertices, @"");
+    _triangleVertices = *triangleVertices;
+    _renderTriangles = YES;
+}
 
+@end
 
 #pragma mark CCEffectRenderPassBeginBlockContext
 
@@ -327,17 +338,27 @@ static NSString* vertBase =
 -(void)enqueueTriangles:(CCEffectRenderPassInputs *)passInputs
 {
     CCRenderState *renderState = [CCRenderState renderStateWithBlendMode:_blendMode shader:_shader shaderUniforms:passInputs.shaderUniforms copyUniforms:YES];
-    
-    GLKMatrix4 transform = passInputs.transform;
-    CCRenderBuffer buffer = [passInputs.renderer enqueueTriangles:2 andVertexes:4 withState:renderState globalSortOrder:0];
+    if(!passInputs.renderTriangles) {
+        GLKMatrix4 transform = passInputs.transform;
+        CCRenderBuffer buffer = [passInputs.renderer enqueueTriangles:2 andVertexes:4 withState:renderState globalSortOrder:0];
 
-    CCRenderBufferSetVertex(buffer, 0, CCVertexApplyTransform(passInputs.verts.bl, &transform));
-	CCRenderBufferSetVertex(buffer, 1, CCVertexApplyTransform(passInputs.verts.br, &transform));
-	CCRenderBufferSetVertex(buffer, 2, CCVertexApplyTransform(passInputs.verts.tr, &transform));
-	CCRenderBufferSetVertex(buffer, 3, CCVertexApplyTransform(passInputs.verts.tl, &transform));
-	
-	CCRenderBufferSetTriangle(buffer, 0, 0, 1, 2);
-	CCRenderBufferSetTriangle(buffer, 1, 0, 2, 3);
+        CCRenderBufferSetVertex(buffer, 0, CCVertexApplyTransform(passInputs.verts.bl, &transform));
+        CCRenderBufferSetVertex(buffer, 1, CCVertexApplyTransform(passInputs.verts.br, &transform));
+        CCRenderBufferSetVertex(buffer, 2, CCVertexApplyTransform(passInputs.verts.tr, &transform));
+        CCRenderBufferSetVertex(buffer, 3, CCVertexApplyTransform(passInputs.verts.tl, &transform));
+
+        CCRenderBufferSetTriangle(buffer, 0, 0, 1, 2);
+        CCRenderBufferSetTriangle(buffer, 1, 0, 2, 3);
+    } else {
+        GLKMatrix4 transform = passInputs.transform;
+        CCRenderBuffer buffer = [passInputs.renderer enqueueTriangles:1 andVertexes:3 withState:renderState globalSortOrder:0];
+
+        CCRenderBufferSetVertex(buffer, 0, CCVertexApplyTransform(passInputs.triangleVertices.v1, &transform));
+        CCRenderBufferSetVertex(buffer, 1, CCVertexApplyTransform(passInputs.triangleVertices.v2, &transform));
+        CCRenderBufferSetVertex(buffer, 2, CCVertexApplyTransform(passInputs.triangleVertices.v3, &transform));
+
+        CCRenderBufferSetTriangle(buffer, 0, 0, 1, 2);
+    }
 }
 
 @end

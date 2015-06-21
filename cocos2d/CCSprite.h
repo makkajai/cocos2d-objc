@@ -32,12 +32,17 @@
 @class CCSpriteBatchNode;
 @class CCSpriteFrame;
 @class CCAnimation;
+@class CCEffectRenderer;
 
 /// The four CCVertexes of a sprite.
 /// Bottom left, bottom right, top right, top left.
 typedef struct CCSpriteVertexes {
 	CCVertex bl, br, tr, tl;
 } CCSpriteVertexes;
+
+typedef struct CCSpriteTriangleVertexes {
+	CCVertex v1, v2, v3;
+} CCSpriteTriangleVertexes;
 
 /// A set of four texture coordinates corresponding to the four
 /// vertices of a sprite. 
@@ -54,7 +59,12 @@ typedef struct CCSpriteTexCoordSet {
  
  The default anchorPoint in CCSprite is (0.5, 0.5).
  */
-@interface CCSprite : CCNode <CCTextureProtocol, CCShaderProtocol, CCBlendProtocol, CCEffectProtocol>
+@interface CCSprite : CCNode <CCTextureProtocol, CCShaderProtocol, CCBlendProtocol, CCEffectProtocol> {
+@protected
+    CCEffectRenderer *_effectRenderer;
+    CCSpriteTriangleVertexes _triangleVertices;
+    BOOL _renderUsingTriangleVertices;
+}
 
 /// -----------------------------------------------------------------------
 /// @name Creating a Sprite with an Image File or Sprite Frame Name
@@ -247,6 +257,7 @@ typedef struct CCSpriteTexCoordSet {
 /// -----------------------------------------------------------------------
 
 @property (nonatomic, readonly) const CCSpriteVertexes *vertexes;
+@property (nonatomic, readonly) const CCSpriteTriangleVertexes *triangleVertices;
 
 /** The offset position in points of the sprite in points. Calculated automatically by sprite sheet editors. */
 @property (nonatomic,readonly) CGPoint	offsetPosition;
@@ -256,6 +267,7 @@ typedef struct CCSpriteTexCoordSet {
 
 /** Returns whether or not the texture rectangle is rotated. Sprite sheet editors may rotate sprite frames in a texture to fit more sprites in the same atlas. */
 @property (nonatomic,readonly) BOOL textureRectRotated;
+@property (nonatomic,readonly) BOOL renderUsingTriangleVertices;
 
 /**
  *  Set the texture rect of the CCSprite in points.
@@ -279,6 +291,5 @@ typedef struct CCSpriteTexCoordSet {
  */
 - (CGAffineTransform)nodeToTextureTransform;
 
-
-
+- (void)setNormalMapSpriteFrame:(CCSpriteFrame *)frame setTextureRectIfRequired:(BOOL)isSetTextureRectIfRequired;
 @end

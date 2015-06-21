@@ -41,6 +41,7 @@
 #import "CCRenderer_Private.h"
 #import "CCSprite_Private.h"
 #import "CCTexture_Private.h"
+#import "CCEffectRenderer.h"
 
 #pragma mark -
 #pragma mark CCSprite
@@ -328,6 +329,11 @@
 	return &_verts;
 }
 
+-(const CCSpriteTriangleVertexes *)triangleVertices
+{
+	return &_triangleVertices;
+}
+
 - (CGAffineTransform)nodeToTextureTransform
 {
     CGFloat sx = (_verts.br.texCoord1.s - _verts.bl.texCoord1.s) / (_verts.br.position.x - _verts.bl.position.x);
@@ -472,12 +478,18 @@
 
 -(void) setNormalMapSpriteFrame:(CCSpriteFrame*)frame
 {
-    if (!self.texture)
+    [self setNormalMapSpriteFrame:frame setTextureRectIfRequired:YES];
+}
+
+-(void) setNormalMapSpriteFrame:(CCSpriteFrame*)frame setTextureRectIfRequired: (BOOL) isSetTextureRectIfRequired
+{
+    if (isSetTextureRectIfRequired && !self.texture)
     {
         // If there is no texture set on the sprite, set the sprite's texture rect from the
         // normal map's sprite frame. Note that setting the main texture, then the normal map,
         // and then removing the main texture will leave the texture rect from the main texture.
-        [self setTextureRect:frame.rect forTexture:frame.texture rotated:frame.rotated untrimmedSize:frame.originalSize];
+        [self setTextureRect:frame.rect forTexture:frame.texture
+                     rotated:frame.rotated untrimmedSize:frame.originalSize];
     }
 
     // Set the second texture coordinate set from the normal map's sprite frame.
@@ -486,11 +498,11 @@
     _verts.br.texCoord2 = texCoords.br;
     _verts.tr.texCoord2 = texCoords.tr;
     _verts.tl.texCoord2 = texCoords.tl;
-    
+
     // Set the normal map texture in the uniforms dictionary (if the dictionary exists).
     self.shaderUniforms[CCShaderUniformNormalMapTexture] = (frame.texture ?: [CCTexture none]);
     _renderState = nil;
-    
+
     _normalMapSpriteFrame = frame;
 }
 

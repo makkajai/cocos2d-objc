@@ -269,20 +269,36 @@ static GLKVector2 selectTexCoordPadding(CCEffectTexCoordSource tcSource, GLKVect
         // - Later pass into intermediate RT : Pad vertices, overwrite texture coordiates so they are lower-left (0,0) upper right (1, 1), add padding to RT, adjust ortho matrix
         //
         
-        CCEffectTexCoordFunc tc1 = selectTexCoordFunc(renderPass.texCoord1Mapping, CCEffectTexCoordSource1, fromIntermediate, padMainTexCoords);
-        CCEffectTexCoordFunc tc2 = selectTexCoordFunc(renderPass.texCoord2Mapping, CCEffectTexCoordSource2, fromIntermediate, padMainTexCoords);
-        
-        CCSpriteVertexes paddedVerts = padVertices(sprite.vertexes, effect.padding, tc1, tc2);
-        [renderPassInputs setVertsWorkAround:&paddedVerts];
-        
-        renderPassInputs.texCoord1Center = GLKVector2Make((sprite.vertexes->tr.texCoord1.s + sprite.vertexes->bl.texCoord1.s) * 0.5f, (sprite.vertexes->tr.texCoord1.t + sprite.vertexes->bl.texCoord1.t) * 0.5f);
-        renderPassInputs.texCoord1Extents = GLKVector2Make(fabsf(sprite.vertexes->tr.texCoord1.s - sprite.vertexes->bl.texCoord1.s) * 0.5f, fabsf(sprite.vertexes->tr.texCoord1.t - sprite.vertexes->bl.texCoord1.t) * 0.5f);
-        renderPassInputs.texCoord2Center = GLKVector2Make((sprite.vertexes->tr.texCoord2.s + sprite.vertexes->bl.texCoord2.s) * 0.5f, (sprite.vertexes->tr.texCoord2.t + sprite.vertexes->bl.texCoord2.t) * 0.5f);
-        renderPassInputs.texCoord2Extents = GLKVector2Make(fabsf(sprite.vertexes->tr.texCoord2.s - sprite.vertexes->bl.texCoord2.s) * 0.5f, fabsf(sprite.vertexes->tr.texCoord2.t - sprite.vertexes->bl.texCoord2.t) * 0.5f);
+        if(sprite.renderUsingTriangleVertices) {
+            CCSpriteTriangleVertexes paddedVerts = (*sprite.triangleVertices);
+            [renderPassInputs setTriangleVertsWorkAround:&paddedVerts];
 
+            float maxS1 = MAX(sprite.triangleVertices->v1.texCoord1.s, MAX(sprite.triangleVertices->v2.texCoord1.s,
+                            sprite.triangleVertices->v3.texCoord1.s));
+            float maxT1 = MAX(sprite.triangleVertices->v1.texCoord1.t, MAX(sprite.triangleVertices->v2.texCoord1.t,
+                            sprite.triangleVertices->v3.texCoord1.t));
+            float minS1 = MIN(sprite.triangleVertices->v1.texCoord1.s, MIN(sprite.triangleVertices->v2.texCoord1.s,
+                            sprite.triangleVertices->v3.texCoord1.s));
+            float minT1 = MIN(sprite.triangleVertices->v1.texCoord1.t, MIN(sprite.triangleVertices->v2.texCoord1.t,
+                            sprite.triangleVertices->v3.texCoord1.t));
+            renderPassInputs.texCoord1Center = GLKVector2Make((maxS1 + minS1) * 0.5f, (maxT1 + minT1) * 0.5f);
+            renderPassInputs.texCoord1Extents = GLKVector2Make(fabsf(maxS1) * 0.5f, fabsf(maxT1) * 0.5f);
+            renderPassInputs.texCoord2Center = renderPassInputs.texCoord1Center;
+            renderPassInputs.texCoord2Extents = renderPassInputs.texCoord1Extents;
+        } else {
+            CCEffectTexCoordFunc tc1 = selectTexCoordFunc(renderPass.texCoord1Mapping, CCEffectTexCoordSource1, fromIntermediate, padMainTexCoords);
+            CCEffectTexCoordFunc tc2 = selectTexCoordFunc(renderPass.texCoord2Mapping, CCEffectTexCoordSource2, fromIntermediate, padMainTexCoords);
+
+            CCSpriteVertexes paddedVerts = padVertices(sprite.vertexes, effect.padding, tc1, tc2);
+            [renderPassInputs setVertsWorkAround:&paddedVerts];
+
+            renderPassInputs.texCoord1Center = GLKVector2Make((sprite.vertexes->tr.texCoord1.s + sprite.vertexes->bl.texCoord1.s) * 0.5f, (sprite.vertexes->tr.texCoord1.t + sprite.vertexes->bl.texCoord1.t) * 0.5f);
+            renderPassInputs.texCoord1Extents = GLKVector2Make(fabsf(sprite.vertexes->tr.texCoord1.s - sprite.vertexes->bl.texCoord1.s) * 0.5f, fabsf(sprite.vertexes->tr.texCoord1.t - sprite.vertexes->bl.texCoord1.t) * 0.5f);
+            renderPassInputs.texCoord2Center = GLKVector2Make((sprite.vertexes->tr.texCoord2.s + sprite.vertexes->bl.texCoord2.s) * 0.5f, (sprite.vertexes->tr.texCoord2.t + sprite.vertexes->bl.texCoord2.t) * 0.5f);
+            renderPassInputs.texCoord2Extents = GLKVector2Make(fabsf(sprite.vertexes->tr.texCoord2.s - sprite.vertexes->bl.texCoord2.s) * 0.5f, fabsf(sprite.vertexes->tr.texCoord2.t - sprite.vertexes->bl.texCoord2.t) * 0.5f);
+        }
         renderPassInputs.needsClear = !toFramebuffer;
         renderPassInputs.shaderUniforms = uniforms;
-        
         CCEffectRenderTarget *rt = nil;
         
         [renderer pushGroup];
