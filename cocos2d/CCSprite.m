@@ -329,9 +329,24 @@
 	return &_verts;
 }
 
--(const CCSpriteTriangleVertexes *)triangleVertices
+-(CCVertex *)triangleVertices
 {
-	return &_triangleVertices;
+	return _triangleVertices;
+}
+
+-(int const *)triangles
+{
+	return _triangles;
+}
+
+-(int)triangleCount
+{
+	return _triangleCount;
+}
+
+-(int)verticesCount
+{
+	return _verticesCount;
 }
 
 - (CGAffineTransform)nodeToTextureTransform
@@ -533,5 +548,22 @@
     // And then copy the new effect's uniforms into the node's uniforms dictionary.
     [_shaderUniforms addEntriesFromDictionary:_effect.effectImpl.shaderUniforms];
 }
+
+- (void)initializeTriangleVertices:(int)triangleCount withVerticesCount:(int)verticesCount {
+    _triangleCount = triangleCount;
+    _verticesCount = verticesCount;
+//    _triangleVertices = malloc(sizeof(struct CCVertex) * verticesCount);
+//    _triangles = malloc(sizeof(int) * triangleCount);
+}
+
+- (void)dealloc {
+    if(_triangleVertices != nil) {
+//        free(_triangleVertices);
+//        free(_triangles);
+        _triangleVertices = nil;
+        _triangles = nil;
+    }
+}
+
 
 @end

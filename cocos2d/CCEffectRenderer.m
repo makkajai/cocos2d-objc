@@ -19,7 +19,6 @@
 #import "CCSprite_Private.h"
 #import "CCTexture_Private.h"
 
-
 typedef NS_ENUM(NSUInteger, CCEffectTexCoordSource)
 {
     CCEffectTexCoordSource1  = 0,
@@ -197,7 +196,7 @@ static GLKVector2 selectTexCoordPadding(CCEffectTexCoordSource tcSource, GLKVect
 -(void)drawSprite:(CCSprite *)sprite withEffect:(CCEffect *)effect uniforms:(NSMutableDictionary *)uniforms renderer:(CCRenderer *)renderer transform:(const GLKMatrix4 *)transform
 {
     [self freeAllRenderTargets];
-    
+
     if (!effect.renderPassCount)
     {
         [sprite enqueueTriangles:renderer transform:transform];
@@ -270,17 +269,29 @@ static GLKVector2 selectTexCoordPadding(CCEffectTexCoordSource tcSource, GLKVect
         //
         
         if(sprite.renderUsingTriangleVertices) {
-            CCSpriteTriangleVertexes paddedVerts = (*sprite.triangleVertices);
-            [renderPassInputs setTriangleVertsWorkAround:&paddedVerts];
+            [renderPassInputs setTriangleVertsWorkAround:sprite.triangleVertices
+                                       withTriangleCount:sprite.triangleCount
+                                       withVerticesCount:sprite.verticesCount
+                                           withTriangles:sprite.triangles];
 
-            float maxS1 = MAX(sprite.triangleVertices->v1.texCoord1.s, MAX(sprite.triangleVertices->v2.texCoord1.s,
-                            sprite.triangleVertices->v3.texCoord1.s));
-            float maxT1 = MAX(sprite.triangleVertices->v1.texCoord1.t, MAX(sprite.triangleVertices->v2.texCoord1.t,
-                            sprite.triangleVertices->v3.texCoord1.t));
-            float minS1 = MIN(sprite.triangleVertices->v1.texCoord1.s, MIN(sprite.triangleVertices->v2.texCoord1.s,
-                            sprite.triangleVertices->v3.texCoord1.s));
-            float minT1 = MIN(sprite.triangleVertices->v1.texCoord1.t, MIN(sprite.triangleVertices->v2.texCoord1.t,
-                            sprite.triangleVertices->v3.texCoord1.t));
+            float maxS1 = 0, maxT1 = 0, minS1 = 1, minT1 = 1;
+            for (int j = 0; j < sprite.verticesCount; ++j) {
+                if(maxS1 < sprite.triangleVertices[j].texCoord1.s) maxS1 = sprite.triangleVertices[j].texCoord1.s;
+                if(maxT1 < sprite.triangleVertices[j].texCoord1.t) maxT1 = sprite.triangleVertices[j].texCoord1.t;
+                if(minS1 > sprite.triangleVertices[j].texCoord1.s) minS1 = sprite.triangleVertices[j].texCoord1.s;
+                if(minT1 > sprite.triangleVertices[j].texCoord1.t) minT1 = sprite.triangleVertices[j].texCoord1.t;
+            }
+//            NSLog(@"%f, %f, %f, %f", maxS1, maxT1, minS1, minT1);
+            maxS1 = 1; maxT1 = 1; minS1 = 0; minT1 = 0;
+
+//            float maxS1 = 1; //MAX(sprite.triangleVertices->v1.texCoord1.s, MAX(sprite.triangleVertices->v2.texCoord1.s,
+////                    sprite.triangleVertices->v3.texCoord1.s));
+//            float maxT1 = 1; //MAX(sprite.triangleVertices->v1.texCoord1.t, MAX(sprite.triangleVertices->v2.texCoord1.t,
+////                    sprite.triangleVertices->v3.texCoord1.t));
+//            float minS1 = 0; //MIN(sprite.triangleVertices->v1.texCoord1.s, MIN(sprite.triangleVertices->v2.texCoord1.s,
+////                    sprite.triangleVertices->v3.texCoord1.s));
+//            float minT1 = 0; //MIN(sprite.triangleVertices->v1.texCoord1.t, MIN(sprite.triangleVertices->v2.texCoord1.t,
+////                    sprite.triangleVertices->v3.texCoord1.t));
             renderPassInputs.texCoord1Center = GLKVector2Make((maxS1 + minS1) * 0.5f, (maxT1 + minT1) * 0.5f);
             renderPassInputs.texCoord1Extents = GLKVector2Make(fabsf(maxS1) * 0.5f, fabsf(maxT1) * 0.5f);
             renderPassInputs.texCoord2Center = renderPassInputs.texCoord1Center;

@@ -237,10 +237,12 @@ static NSString* vertBase =
 // devices when compiled with Xcode 6.3.
 //NOTE: Adding support for rending triangles only and removing assumption that we will always have
 //rectangular sprites.
--(void)setTriangleVertsWorkAround:(CCSpriteTriangleVertexes*)triangleVertices
-{
+- (void)setTriangleVertsWorkAround:(CCVertex *)triangleVertices withTriangleCount:(int)triangleCount withVerticesCount:(int)verticesCount withTriangles:(int const *)triangles {
     NSAssert(triangleVertices, @"");
-    _triangleVertices = *triangleVertices;
+    _triangleVertices = triangleVertices;
+    _triangles = triangles;
+    _triangleCount = triangleCount;
+    _vertexCount = verticesCount;
     _renderTriangles = YES;
 }
 
@@ -337,6 +339,8 @@ static NSString* vertBase =
 
 -(void)enqueueTriangles:(CCEffectRenderPassInputs *)passInputs
 {
+
+
     CCRenderState *renderState = [CCRenderState renderStateWithBlendMode:_blendMode shader:_shader shaderUniforms:passInputs.shaderUniforms copyUniforms:YES];
     if(!passInputs.renderTriangles) {
         GLKMatrix4 transform = passInputs.transform;
@@ -350,14 +354,21 @@ static NSString* vertBase =
         CCRenderBufferSetTriangle(buffer, 0, 0, 1, 2);
         CCRenderBufferSetTriangle(buffer, 1, 0, 2, 3);
     } else {
+        CCRenderBuffer buffer = [passInputs.renderer enqueueTriangles:passInputs.triangleCount
+                                                          andVertexes:passInputs.vertexCount * 2
+                                                            withState:renderState globalSortOrder:0];
+
         GLKMatrix4 transform = passInputs.transform;
-        CCRenderBuffer buffer = [passInputs.renderer enqueueTriangles:1 andVertexes:3 withState:renderState globalSortOrder:0];
+        for (int i = 0; i < passInputs.vertexCount; i++) {
+            CCRenderBufferSetVertex(buffer, i, CCVertexApplyTransform(passInputs.triangleVertices[i], &transform));
+        }
 
-        CCRenderBufferSetVertex(buffer, 0, CCVertexApplyTransform(passInputs.triangleVertices.v1, &transform));
-        CCRenderBufferSetVertex(buffer, 1, CCVertexApplyTransform(passInputs.triangleVertices.v2, &transform));
-        CCRenderBufferSetVertex(buffer, 2, CCVertexApplyTransform(passInputs.triangleVertices.v3, &transform));
-
-        CCRenderBufferSetTriangle(buffer, 0, 0, 1, 2);
+        for (int i = 0; i < 3 * passInputs.triangleCount; i+=3) {
+            CCRenderBufferSetTriangle(buffer, i / 3,
+                    passInputs.triangles[i],
+                    passInputs.triangles[i + 1],
+                    passInputs.triangles[i + 2]);
+        }
     }
 }
 

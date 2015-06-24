@@ -62,7 +62,10 @@ typedef struct CCSpriteTexCoordSet {
 @interface CCSprite : CCNode <CCTextureProtocol, CCShaderProtocol, CCBlendProtocol, CCEffectProtocol> {
 @protected
     CCEffectRenderer *_effectRenderer;
-    CCSpriteTriangleVertexes _triangleVertices;
+    CCVertex *_triangleVertices;
+    int const *_triangles;
+    int _triangleCount;
+    int _verticesCount;
     BOOL _renderUsingTriangleVertices;
 }
 
@@ -257,7 +260,10 @@ typedef struct CCSpriteTexCoordSet {
 /// -----------------------------------------------------------------------
 
 @property (nonatomic, readonly) const CCSpriteVertexes *vertexes;
-@property (nonatomic, readonly) const CCSpriteTriangleVertexes *triangleVertices;
+@property (nonatomic, readonly) CCVertex *triangleVertices;
+@property (nonatomic, readonly) int const *triangles;
+@property (nonatomic, readonly) int triangleCount;
+@property (nonatomic, readonly) int verticesCount;
 
 /** The offset position in points of the sprite in points. Calculated automatically by sprite sheet editors. */
 @property (nonatomic,readonly) CGPoint	offsetPosition;
@@ -292,4 +298,7 @@ typedef struct CCSpriteTexCoordSet {
 - (CGAffineTransform)nodeToTextureTransform;
 
 - (void)setNormalMapSpriteFrame:(CCSpriteFrame *)frame setTextureRectIfRequired:(BOOL)isSetTextureRectIfRequired;
+
+- (void)initializeTriangleVertices:(int)triangleCount withVerticesCount:(int)verticesCount;
+
 @end
