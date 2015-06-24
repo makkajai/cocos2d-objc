@@ -66,7 +66,6 @@ typedef struct CCSpriteTexCoordSet {
     int const *_triangles;
     int _triangleCount;
     int _verticesCount;
-    BOOL _renderUsingTriangleVertices;
 }
 
 /// -----------------------------------------------------------------------
@@ -299,6 +298,6 @@ typedef struct CCSpriteTexCoordSet {
 
 - (void)setNormalMapSpriteFrame:(CCSpriteFrame *)frame setTextureRectIfRequired:(BOOL)isSetTextureRectIfRequired;
 
-- (void)initializeTriangleVertices:(int)triangleCount withVerticesCount:(int)verticesCount;
+- (void)initializeTriangleVertices:(int)triangleCount withVerticesCount:(int)verticesCount withVertices:(CCVertex[])vertices withTriangles:(int const *)triangles;
 
 @end

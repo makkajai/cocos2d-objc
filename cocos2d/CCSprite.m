@@ -549,21 +549,15 @@
     [_shaderUniforms addEntriesFromDictionary:_effect.effectImpl.shaderUniforms];
 }
 
-- (void)initializeTriangleVertices:(int)triangleCount withVerticesCount:(int)verticesCount {
+- (void)initializeTriangleVertices:(int)triangleCount
+                 withVerticesCount:(int)verticesCount
+                      withVertices:(CCVertex[])vertices
+                     withTriangles:(int const *)triangles {
+    _renderUsingTriangleVertices = YES;
     _triangleCount = triangleCount;
     _verticesCount = verticesCount;
-//    _triangleVertices = malloc(sizeof(struct CCVertex) * verticesCount);
-//    _triangles = malloc(sizeof(int) * triangleCount);
+    _triangleVertices = vertices;
+    _triangles = triangles;
 }
-
-- (void)dealloc {
-    if(_triangleVertices != nil) {
-//        free(_triangleVertices);
-//        free(_triangles);
-        _triangleVertices = nil;
-        _triangles = nil;
-    }
-}
-
 
 @end

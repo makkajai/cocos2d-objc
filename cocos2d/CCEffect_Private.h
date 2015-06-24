@@ -136,7 +136,7 @@ typedef NS_ENUM(NSUInteger, CCEffectTexCoordMapping)
 
 -(void)setVertsWorkAround:(CCSpriteVertexes*)verts;
 
-- (void)setTriangleVertsWorkAround:(CCVertex *)triangleVertexes withTriangleCount:(int)triangleCount withVerticesCount:(int)verticesCount withTriangles:(int const *)triangles;
+- (void)setTriangleVertsWorkAround:(CCVertex *)triangleVertexes withTriangles:(int const *)triangles withVerticesCount:(int)verticesCount withTriangleCount:(int)triangleCount;
 
 @end
 

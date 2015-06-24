@@ -237,7 +237,10 @@ static NSString* vertBase =
 // devices when compiled with Xcode 6.3.
 //NOTE: Adding support for rending triangles only and removing assumption that we will always have
 //rectangular sprites.
-- (void)setTriangleVertsWorkAround:(CCVertex *)triangleVertices withTriangleCount:(int)triangleCount withVerticesCount:(int)verticesCount withTriangles:(int const *)triangles {
+- (void)setTriangleVertsWorkAround:(CCVertex *)triangleVertices
+                     withTriangles:(int const *)triangles
+                 withVerticesCount:(int)verticesCount
+                 withTriangleCount:(int)triangleCount {
     NSAssert(triangleVertices, @"");
     _triangleVertices = triangleVertices;
     _triangles = triangles;
@@ -355,7 +358,7 @@ static NSString* vertBase =
         CCRenderBufferSetTriangle(buffer, 1, 0, 2, 3);
     } else {
         CCRenderBuffer buffer = [passInputs.renderer enqueueTriangles:passInputs.triangleCount
-                                                          andVertexes:passInputs.vertexCount * 2
+                                                          andVertexes:passInputs.vertexCount
                                                             withState:renderState globalSortOrder:0];
 
         GLKMatrix4 transform = passInputs.transform;
