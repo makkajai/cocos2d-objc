@@ -176,7 +176,7 @@ PageOffset(NSUInteger firstVertex, NSUInteger vertexCount)
 		[previous batch:indexCount];
 	} else {
 		// Start a new command.
-		CCRenderCommandDraw *command = [[CCRenderCommandDrawClass alloc] initWithMode:CCRenderCommandDrawTriangles renderState:renderState firstIndex:firstIndex vertexPage:vertexPage count:indexCount globalSortOrder:globalSortOrder];
+		CCRenderCommandDraw *command = [[(CCRenderCommandDraw *) [CCRenderCommandDrawClass alloc] autorelease] initWithMode:CCRenderCommandDrawTriangles renderState:renderState firstIndex:firstIndex vertexPage:vertexPage count:indexCount globalSortOrder:globalSortOrder];
 		[_queue addObject:command];
 #if NO_ARC != 0
 		[command release];
