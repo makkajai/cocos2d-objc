@@ -401,6 +401,9 @@
             _exclusiveMode = NO;
         }
     }
+    // NOTE: Even if we cannot find any matches just always reset the exclusive mode on touch end!
+    //This makes sure tht we never have all touches disabled situation!
+    _exclusiveMode = NO;
 }
 
 // -----------------------------------------------------------------
