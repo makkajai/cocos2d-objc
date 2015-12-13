@@ -56,10 +56,12 @@
     {
         CCTouch* ccTouch = [_deadTouches anyObject];
         ccTouch.uiTouch = touch;
-        
-        [_allTouches setObject:ccTouch forKey:[NSValue valueWithNonretainedObject:touch]];
-        
-        [_deadTouches removeObject:ccTouch];
+
+        if(ccTouch) {
+            [_allTouches setObject:ccTouch forKey:[NSValue valueWithNonretainedObject:touch]];
+
+            [_deadTouches removeObject:ccTouch];
+        }
     }
     
     // Set currentTouches
