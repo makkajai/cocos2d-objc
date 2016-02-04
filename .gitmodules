@@ -4,3 +4,6 @@ url=https://github.com/slembcke/Chipmunk2D.git
 [submodule "external/SSZipArchive"]
 	path = external/SSZipArchive
 	url = https://github.com/spritebuilder/ssziparchive.git
+[submodule "external/ObjectAL-for-iPhone"]
+	path = external/ObjectAL-for-iPhone
+	url = https://github.com/kstenerud/ObjectAL-for-iPhone
