@@ -397,7 +397,7 @@
 		int y = [value intValue] + objectGroup.positionOffset.y;
 
 			// Correct y position. (Tiled uses Flipped, cocos2d uses Standard)
-			y = (_mapSize.height * _tileSize.height * [CCDirector sharedDirector].contentScaleFactor) - y - [[attributeDict objectForKey:@"height"] intValue];
+			y = (_mapSize.height * _tileSize.height * _contentScale) - y - [[attributeDict objectForKey:@"height"] intValue];
 			[dict setObject:[NSNumber numberWithInt:y] forKey:@"y"];
 		}
 		
