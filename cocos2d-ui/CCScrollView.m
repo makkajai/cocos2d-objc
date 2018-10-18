@@ -765,9 +765,11 @@
 {
     // Add recognizers to view
     UIView* view = [CCDirector sharedDirector].view;
-    
-    NSMutableArray* recognizers = [view.gestureRecognizers mutableCopy];
-    if (!recognizers) recognizers = [NSMutableArray arrayWithCapacity:2];
+
+    //NOTE: This methd gets called multiple times and adding the touch event handles multiple times
+    //causes the scroll layer to not get the touch events. Always setting up the recognizers freshly so that
+    //Touch events are recognized -- DEEP
+    NSMutableArray* recognizers = [NSMutableArray arrayWithCapacity:2];
     [recognizers insertObject:_panRecognizer atIndex:0];
     [recognizers insertObject:_tapRecognizer atIndex:0];
     
