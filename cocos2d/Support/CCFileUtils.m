@@ -33,6 +33,7 @@
 
 NSString * const CCFileUtilsSuffixDefault = @"default";
 
+NSString * const CCFileUtilsSuffixiPhoneX = @"iphonexs";
 NSString * const CCFileUtilsSuffixiPad = @"ipad";
 NSString * const CCFileUtilsSuffixiPadHD = @"ipadhd";
 NSString * const CCFileUtilsSuffixiPhone = @"iphone";
@@ -157,6 +158,7 @@ static CCFileUtils *fileUtils = nil;
 								
 #if __CC_PLATFORM_IOS || __CC_PLATFORM_ANDROID
 		_suffixesDict = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
+                         @"-iphonexs", CCFileUtilsSuffixiPhoneX,
 						 @"-ipad", CCFileUtilsSuffixiPad,
 						 @"-ipadhd", CCFileUtilsSuffixiPadHD,
 						 @"", CCFileUtilsSuffixiPhone,
