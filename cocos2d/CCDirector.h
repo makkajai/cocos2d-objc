@@ -433,6 +433,11 @@ typedef NS_ENUM(NSUInteger, CCDirectorProjection) {
  @see stopAnimation */
 -(void) startAnimation;
 
+/** Boolean indicating whether its the root scene running.
+ */
+-(BOOL) isRootScene;
+
+
 #pragma mark Director - Memory Helper
 
 /** @name Purging Caches */

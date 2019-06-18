@@ -593,6 +593,11 @@ static CCDirector *_sharedDirector = nil;
 	[self popToSceneStackLevel:1];
 }
 
+-(BOOL) isRootScene
+{
+	return [_scenesStack count] <= 1;
+}
+
 -(void) popToRootSceneWithTransition:(CCTransition *)transition {
 	[self popToRootScene];
 	_sendCleanupToScene = YES;
